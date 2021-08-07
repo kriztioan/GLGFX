@@ -4,6 +4,8 @@
 
 `Mine Sweeper` is written using [`GL GFX`](../README.md).
 
+![Mine Sweeper in Action](MineSweeper.png "Mine Sweeper in Action")
+
 ## Usage
 
 `Mine Sweeper` is compiled with:
