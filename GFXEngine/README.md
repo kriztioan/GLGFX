@@ -4,6 +4,8 @@
 
 `GXEngine` is written using [`GL GFX`](../README.md).
 
+![GFXEngine in Action](GFXEngine.png "GFXEngine in Action")
+
 ## Usage
 
 `GFXEngine` is compiled with:
