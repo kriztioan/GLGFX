@@ -6,6 +6,8 @@ It is inspired by a One Lone Coder [YouTube video](https://youtu.be/E7CxMHsYzSs)
 
 `Game of Life` is written using [`GL GFX`](../README.md).
 
+![Game of Life in Action](GameOfLife.png "Game of Life in Action")
+
 ## Usage
 
 `Game of Life` is compiled with:
