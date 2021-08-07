@@ -4,6 +4,8 @@
 
 `Flappy Bird` is written using [`GL GFX`](../README.md).
 
+![Flappy Bird in Action](FlappyBird.png "Plappy Bird in Action")
+
 ## Usage
 
 `Flappy Bird` is compiled with:
