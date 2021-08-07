@@ -4,6 +4,8 @@
 
 `Tetris` is written using the [`GL GFX`](../README.md).
 
+![Tetris in Action](Tetris.png "Tetris in Action")
+
 ## Usage
 
 `Tetris` is compiled with:
