@@ -4,6 +4,8 @@
 
 `Paratroopers` is written in `C`/`C++` and is platform agnostic when it comes to graphics, sound, and input. Here, [`GL GFX`](../README.md) provides the game with an interface for graphics, sound, and input.
 
+![Paratroopers in Action](Paratroopers.png "Paratroopers in Action")
+
 ## Usage
 
 `Paratroopers` is compiled with:
