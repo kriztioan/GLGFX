@@ -2,6 +2,8 @@
 
 `Destroyer` is a submarine targeting game written using [`GL GFX`](../README.md).
 
+![Destroyer in Action](Destroyer.png "Destroyer in Action")
+
 ## Usage
 
 `Destroyer` is compiled with:
