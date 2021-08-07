@@ -4,6 +4,8 @@
 
 `Synth` is written using [`GL GFX`](../README.md) and relies on the [FFTW](http://fftw.org) library for spectral analysis.
 
+![Synth in Action](Synth.png "Synth in Action")
+
 ## Usage
 
 `Synth` is compiled with:
