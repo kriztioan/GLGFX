@@ -4,6 +4,8 @@
 
 `Frogger` is written using [`GL GFX`](../README.md).
 
+![Frogger in Action](Frogger.png "Frogger in Action")
+
 ## Usage
 
 `Frogger` is compiled with:
