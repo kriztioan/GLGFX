@@ -36,8 +36,8 @@ typedef struct {
 } RGB;
 
 typedef struct {
-  int width;
-  int height;
+  uint16_t width;
+  uint16_t height;
   RGB *rgb;
 } Bitmap;
 
@@ -607,11 +607,22 @@ private:
 
     auto *bitmap = new Bitmap;
 
-    std::memcpy(&bitmap->width, header + 18, sizeof(int));
-    std::memcpy(&bitmap->height, header + 22, sizeof(int));
+    uint16_t sig;
+    std::memcpy(&sig, header, sizeof(sig));
+    if (sig != 0x4d42)
+      return bitmap;
+
+    std::memcpy(&bitmap->width, header + 18, sizeof(bitmap->width));
+    std::memcpy(&bitmap->height, header + 22, sizeof(bitmap->height));
     bitmap->rgb = nullptr;
 
     if (bitmap->width * bitmap->height <= 0)
+      return bitmap;
+
+    uint16_t bpp;
+    std::memcpy(&bpp, header + 28, sizeof(bpp));
+
+    if(bpp != 24)
       return bitmap;
 
     bitmap->rgb = new RGB[bitmap->width * bitmap->height];
