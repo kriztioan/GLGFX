@@ -12,6 +12,7 @@
 
 #include "../Audio.h"
 #include "../GLGFX.h"
+#include "../Widgets.h"
 
 #include <cmath>
 extern "C" {
@@ -20,17 +21,22 @@ extern "C" {
 }
 #include <algorithm>
 
+bool wave_type_callback(cb::WidgetButton *button, void *userdata);
+bool window_type_callback(cb::WidgetButton *button, void *userdata);
+bool quit_callback(cb::WidgetButton *button, void *userdata);
+
+typedef struct {
+  float *ones;
+  float *hanning;
+  float *hamming;
+  float *window;
+} Windows;
 class Synth : public cb::Audio, public cb::GLGFX {
 
 public:
-  enum WAVE_T {
-    WAVE_NOISE,
-    WAVE_SQUARE,
-    WAVE_TRIANGLE,
-    WAVE_SAW,
-    WAVE_SINE,
-    WAVE_MAX
-  };
+  enum WAVE_T { WAVE_SINE, WAVE_SQUARE, WAVE_TRIANGLE, WAVE_SAW, WAVE_NOISE };
+
+  enum WINDOW_T { WINDOW_NONE, WINDOW_HANNING, WINDOW_HAMMING };
 
   Synth() {
 
@@ -49,20 +55,21 @@ public:
 
     sample = fftwf_alloc_real(sample_size);
 
-    ones = fftwf_alloc_real(sample_size);
-    std::fill_n(ones, sample_size, 1.0f);
+    windows.ones = fftwf_alloc_real(sample_size);
+    std::fill_n(windows.ones, sample_size, 1.0f);
 
-    hanning = fftwf_alloc_real(sample_size);
+    windows.hanning = fftwf_alloc_real(sample_size);
     for (int i = 0; i < sample_size; i++)
-      hanning[i] = 0.5f - 0.5f * std::cos(2.0f * M_PI * static_cast<float>(i) /
-                                          static_cast<float>(sample_size - 1));
-    hamming = fftwf_alloc_real(sample_size);
+      windows.hanning[i] =
+          0.5f - 0.5f * std::cos(2.0f * M_PI * static_cast<float>(i) /
+                                 static_cast<float>(sample_size - 1));
+    windows.hamming = fftwf_alloc_real(sample_size);
     for (int i = 0; i < sample_size; i++)
-      hamming[i] =
+      windows.hamming[i] =
           0.54f - 0.46f * std::cos(2.0f * M_PI * static_cast<float>(i) /
                                    static_cast<float>(sample_size - 1));
 
-    window = ones;
+    windows.window = windows.ones;
 
     fft = fftwf_alloc_complex(1 + sample_size / 2);
 
@@ -78,30 +85,67 @@ public:
 
   void OnUserDestroy() final {
     fftwf_free(sample);
-    fftwf_free(ones);
-    fftwf_free(hanning);
-    fftwf_free(hamming);
+    fftwf_free(windows.ones);
+    fftwf_free(windows.hanning);
+    fftwf_free(windows.hamming);
     fftw_free(fft);
     fftwf_destroy_plan(plan);
   }
 
-  bool OnUserCreate() final { return true; }
+  bool OnUserCreate() final {
+
+    cb::WidgetRadioGroup radio_wave_type, radio_window_type;
+
+    cb::WidgetButton button;
+    button.xpos = 0;
+    button.width = 37;
+    button.color = FG_RED;
+    button.border = FG_BLACK;
+    button.userdata = (void *)&wave_type;
+    button.callback = wave_type_callback;
+    for (const auto &text :
+         std::array<std::string, 5>({"SIN", "SQ", "TRI", "SAW", "NOI"})) {
+
+      button.text = text;
+
+      radio_wave_type.add(button);
+      button.xpos += button.width + 1;
+    }
+    radio_wave_type.select(WAVE_SINE);
+
+    button.color = FG_GREEN;
+    button.border = FG_BLACK;
+    button.userdata = (void *)&windows;
+    button.callback = window_type_callback;
+    for (const auto &text : std::array<std::string, 3>({"NO", "HAN", "HAM"})) {
+
+      button.text = text;
+
+      radio_window_type.add(button);
+      button.xpos += button.width + 1;
+    }
+    radio_window_type.select(WINDOW_NONE);
+
+    button.text = "X";
+    button.border = FG_BLACK;
+    button.color = FG_GREY5;
+    button.userdata = (void *)&finished;
+    button.callback = quit_callback;
+    button.width = 13;
+    button.xpos = ScreenWidth() - button.width - 1;
+    widgets.add(button);
+
+    widgets.glgfx = this;
+    widgets.add(radio_wave_type);
+    widgets.add(radio_window_type);
+
+    return true;
+  }
 
   bool OnUserUpdate(float fElapsedTime) final {
 
     if (KeyUp('q'))
-      return false;
-    for (int k = 0; k < WAVE_MAX; k++) {
-      if (KeyUp('1' + k)) {
-        wave_type = k;
-      }
-    }
-    if (KeyUp('0'))
-      window = ones;
-    if (KeyUp('9'))
-      window = hamming;
-    if (KeyUp('8'))
-      window = hanning;
+      finished = true;
     if (KeyUp('p'))
       bShowFPS = !bShowFPS;
 
@@ -116,22 +160,12 @@ public:
 
     Clear(FG_BLACK);
 
-    DrawString(8, 8, "Frequency");
-    DrawString(8 + 10 * 8, 8, std::to_string((int)frequency));
-    DrawString(8 + 10 * 8 + 4 * 8, 8, "Hz");
-
-    static constexpr const char *wave_str[] = {"NOISE", "SQUARE", "TRIANGLE",
-                                               "SAW", "SINE"};
-    DrawString(ScreenWidth() - 72, 8, wave_str[wave_type]);
-
-    DrawLine(0, 24, ScreenWidth() - 1, 24);
-
     short p, x0 = 0, y0 = 90, x1, y1;
 
     size_t step_size = sample_size / ScreenWidth();
     for (size_t i = 0; i < sample_size; i++) {
       callback((double)i, &p, sizeof(short));
-      sample[i] = static_cast<float>(p) * window[i];
+      sample[i] = static_cast<float>(p) * windows.window[i];
       if ((i % step_size) == 0) {
         x1 = i / step_size;
         y1 = 90 + (sample[i] / 20);
@@ -148,6 +182,10 @@ public:
     DrawString(8 + 5 * 8 + 5 * 8, 146, "ms", FG_RED);
 
     DrawLine(0, 160, ScreenWidth() - 1, 160);
+
+    DrawString(180, 168, "Frequency", FG_GREEN);
+    DrawString(180 + 10 * 8, 168, std::to_string((int)frequency), FG_GREEN);
+    DrawString(180 + 10 * 8 + 4 * 8, 168, "Hz", FG_GREEN);
 
     float fft_max = 1.0f;
     for (size_t i = 1; i < ((sample_size >> 1) + 1); i++) {
@@ -177,7 +215,9 @@ public:
 
     DrawLine(0, ScreenHeight() - 8, ScreenWidth() - 1, ScreenHeight() - 8);
 
-    return true;
+    widgets.update();
+
+    return !finished;
   }
 
   void Start() {
@@ -223,14 +263,13 @@ protected:
   };
 
 private:
+  cb::Widgets widgets;
   double frequency = 0.0;
   int wave_type = WAVE_SINE;
+  bool finished = false;
   static constexpr const size_t sample_size = 2048;
   static constexpr const float f_base = 440.0f;
-  float *ones;
-  float *hanning;
-  float *hamming;
-  float *window;
+  Windows windows;
   float *sample;
   size_t sample_min = 0;
   size_t sample_max = 0;
@@ -238,5 +277,50 @@ private:
   fftwf_plan plan;
   static constexpr const char *plan_filename = "plan.fftwf";
 };
+
+bool wave_type_callback(cb::WidgetButton *button, void *userdata) {
+
+  int *waveform = static_cast<int *>(userdata);
+
+  if (button->text == "SIN") {
+    *waveform = Synth::WAVE_SINE;
+  } else if (button->text == "SQ") {
+    *waveform = Synth::WAVE_SQUARE;
+  } else if (button->text == "TRI") {
+    *waveform = Synth::WAVE_TRIANGLE;
+  } else if (button->text == "SAW") {
+    *waveform = Synth::WAVE_SAW;
+  } else if (button->text == "NOI") {
+    *waveform = Synth::WAVE_NOISE;
+  } else {
+    return false;
+  }
+
+  return true;
+}
+
+bool window_type_callback(cb::WidgetButton *button, void *userdata) {
+
+  Windows *w = static_cast<Windows *>(userdata);
+
+  if (button->text == "NO") {
+    w->window = w->ones;
+  } else if (button->text == "HAN") {
+    w->window = w->hanning;
+  } else if (button->text == "HAM") {
+    w->window = w->hamming;
+  } else {
+    return false;
+  }
+
+  return true;
+}
+
+bool quit_callback(cb::WidgetButton *button, void *userdata) {
+
+  bool *finished = static_cast<bool *>(userdata);
+  *finished = true;
+  return true;
+}
 
 #endif // CBGLGFX_SYNTH_H

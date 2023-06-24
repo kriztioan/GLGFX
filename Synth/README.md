@@ -1,6 +1,6 @@
 # Synth
 
-`Synth` is a sound synthesizer, visualizer, and spectral analyzer. It was inspired by a One Lone Coder [YouTube video](https://www.youtube.com/watch?v=tgamhuQnOkM)) ([GitHub](https://github.com/OneLoneCoder/synth)).
+`Synth` is a sound synthesizer, visualizer, and spectrum analyzer. It was inspired by a One Lone Coder [YouTube video](https://www.youtube.com/watch?v=tgamhuQnOkM) ([GitHub](https://github.com/OneLoneCoder/synth)).
 
 `Synth` is written using [`GL GFX`](../README.md) and relies on the [FFTW](http://fftw.org) library for spectral analysis.
 
@@ -21,21 +21,28 @@ This results in a binary executable called `Synth`, which is invoked as:
 ./Synth
 ```
 
-`Synth` relies on the keyboard for input. The table below lists the keys that are recognized and their associated action.
+`Synth` relies on both keyboard and mouse input. The table below lists the keys that
+are recognized and their associated action.
 
-|key|action|
-----|-----
-|`1`|noise generator|
-|`2`|square wave generator|
-|`3`|triangular wave generator|
-|`4`|sawtooth wave generator|
-|`5`|sine wave generator|
-|`8`|hanning window|
-|`9`|hamming window|
-|`0`|no window|
-|`z` `s` `x` `c` `f` `v` `g` `b` `n` `j` `m` `k` `,` `l` `.` `/`|piano keys 49-64|
-|`p`|show FPS|
-|`q`|quit|
+| key                                                             | action           |
+| --------------------------------------------------------------- | ---------------- |
+| `z` `s` `x` `c` `f` `v` `g` `b` `n` `j` `m` `k` `,` `l` `.` `/` | piano keys 49-64 |
+| `p`                                                             | show FPS         |
+| `q`                                                             | quit             |
+
+The menu items and their associated actions are listed in the following table.
+
+| item  | action                    |
+| ----- | ------------------------- |
+| `SIN` | sine wave generator       |
+| `SQ`  | square wave generator     |
+| `TRI` | triangular wave generator |
+| `SAW` | sawtooth wave generator   |
+| `NOI` | noise generator           |
+| `NO`  | no window                 |
+| `HAN` | hanning window            |
+| `HAM` | hamming window            |
+| `X`   | quit                      |
 
 ## Notes
 
