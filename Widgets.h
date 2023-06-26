@@ -35,7 +35,7 @@ public:
 class cb::Widgets {
 public:
   void add(Widget &widget) {
-    widgets.emplace_back(std::unique_ptr<Widget>(widget.clone()));
+    widgets.emplace_back(widget.clone());
   }
 
   void update() {
@@ -114,7 +114,7 @@ public:
   WidgetRadioGroup(WidgetRadioGroup &other) {
     for (auto &button : other.buttons) {
       WidgetButton *button_ptr = button->clone();
-      buttons.emplace_back(std::unique_ptr<WidgetButton>(button_ptr));
+      buttons.emplace_back(button_ptr);
       if (button.get() == other.sel) {
         sel = button_ptr;
       }
@@ -158,7 +158,7 @@ public:
     return false;
   }
   void add(WidgetButton &button) {
-    buttons.emplace_back(std::unique_ptr<WidgetButton>(button.clone()));
+    buttons.emplace_back(button.clone());
   }
 
 private:
