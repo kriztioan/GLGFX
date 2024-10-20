@@ -567,7 +567,7 @@ public:
 
   [[maybe_unused]] static Bitmap *LoadBitMap(const char *d, std::streamsize s) {
 
-    std::istrstream istrstr(d, s);
+    std::istringstream istrstr(std::string(d, s));
 
     return ReadBitmapFromStream(istrstr);
   }
@@ -580,7 +580,7 @@ public:
     uncompress(reinterpret_cast<Bytef *>(d), &s,
                reinterpret_cast<const Bytef *>(z), s_z);
 
-    std::istrstream istrstr(d, s);
+    std::istringstream istrstr(std::string(d, s));
 
     Bitmap *bitmap = ReadBitmapFromStream(istrstr);
 
