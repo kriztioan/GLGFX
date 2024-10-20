@@ -44,14 +44,48 @@ typedef struct {
 class cb::GLGFX {
 
 public:
-  enum [[maybe_unused]] colors{
-      FG_BLACK = 0, FG_RED,     FG_GREEN,  FG_YELLOW, FG_BLUE,   FG_MAGENTA,
-      FG_GREY,      FG_WHITE,   FG_CYAN,   FG_MAROON, FG_LIME,   FG_BROWN,
-      FG_NAVY,      FG_FUCHSIA, FG_TEAL,   FG_GREY1,  FG_GREY2,  FG_GREY3,
-      FG_GREY4,     FG_GREY5,   FG_GREY6,  FG_GREY7,  FG_GREY8,  FG_GREY9,
-      FG_GREY10,    FG_GREY11,  FG_GREY12, FG_GREY13, FG_GREY14, FG_GREY15,
-      FG_GREY16,    FG_GREY17,  FG_GREY18, FG_GREY20, FG_GREY21, FG_GREY22,
-      FG_GREY23,    FG_GREY24,  FG_GREY25, FG_COLORS};
+  enum [[maybe_unused]] colors {
+    FG_BLACK = 0,
+    FG_RED,
+    FG_GREEN,
+    FG_YELLOW,
+    FG_BLUE,
+    FG_MAGENTA,
+    FG_GREY,
+    FG_WHITE,
+    FG_CYAN,
+    FG_MAROON,
+    FG_LIME,
+    FG_BROWN,
+    FG_NAVY,
+    FG_FUCHSIA,
+    FG_TEAL,
+    FG_GREY1,
+    FG_GREY2,
+    FG_GREY3,
+    FG_GREY4,
+    FG_GREY5,
+    FG_GREY6,
+    FG_GREY7,
+    FG_GREY8,
+    FG_GREY9,
+    FG_GREY10,
+    FG_GREY11,
+    FG_GREY12,
+    FG_GREY13,
+    FG_GREY14,
+    FG_GREY15,
+    FG_GREY16,
+    FG_GREY17,
+    FG_GREY18,
+    FG_GREY20,
+    FG_GREY21,
+    FG_GREY22,
+    FG_GREY23,
+    FG_GREY24,
+    FG_GREY25,
+    FG_COLORS
+  };
 
   GLGFX() {
 
@@ -567,9 +601,11 @@ public:
 
   [[maybe_unused]] static Bitmap *LoadBitMap(const char *d, std::streamsize s) {
 
-    std::istringstream istrstr(std::string(d, s));
+    extbuf buf(d, s);
 
-    return ReadBitmapFromStream(istrstr);
+    std::istream in(&buf);
+
+    return ReadBitmapFromStream(in);
   }
 
   [[maybe_unused]] static Bitmap *z_LoadBitmap(const char *z,
@@ -580,9 +616,11 @@ public:
     uncompress(reinterpret_cast<Bytef *>(d), &s,
                reinterpret_cast<const Bytef *>(z), s_z);
 
-    std::istringstream istrstr(std::string(d, s));
+    extbuf buf(d, s);
 
-    Bitmap *bitmap = ReadBitmapFromStream(istrstr);
+    std::istream in(&buf);
+
+    Bitmap *bitmap = ReadBitmapFromStream(in);
 
     delete[] d;
 
@@ -622,7 +660,7 @@ private:
     uint16_t bpp;
     std::memcpy(&bpp, header + 28, sizeof(bpp));
 
-    if(bpp != 24)
+    if (bpp != 24)
       return bitmap;
 
     bitmap->rgb = new RGB[bitmap->width * bitmap->height];
@@ -675,7 +713,7 @@ private:
 
   bool bButtonPrevious[3]{false};
 
-  virtual void OnUserDestroy(){};
+  virtual void OnUserDestroy() {};
 
   virtual bool OnUserResize() { return true; }
 

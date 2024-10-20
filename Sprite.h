@@ -11,9 +11,29 @@
 #define CBGLGFX_SPRITE_H
 
 #include <fstream>
-#include <sstream>
+#include <streambuf>
 #include <string>
 #include <utility>
+
+class extbuf : public std::streambuf {
+public:
+  extbuf(const char *d, size_t s) : beg(d), crt(d), end(d + s) {}
+
+  int_type underflow() {
+    return crt == end ? traits_type::eof() : traits_type::to_int_type(*crt);
+  }
+  int_type uflow() {
+    return crt == end ? traits_type::eof() : traits_type::to_int_type(*crt++);
+  }
+  int_type pbackfail(int_type ch) {
+    bool cond = crt == beg || (ch != traits_type::eof() && ch != crt[-1]);
+    return cond ? traits_type::eof() : traits_type::to_int_type(*--crt);
+  }
+  std::streamsize showmanyc() { return end - crt; }
+
+private:
+  const char *beg, *crt, *end;
+};
 
 extern "C" {
 #include <zlib.h>
@@ -64,21 +84,29 @@ public:
 
   [[maybe_unused]] bool Load(const char *d, std::streamsize s) {
 
-    std::istringstream istrstr(std::string(d, s));
+    extbuf buf(d, s);
 
-    return ReadFromStream(istrstr);
+    std::istream in(&buf);
+
+    return ReadFromStream(in);
   }
 
   [[maybe_unused]] bool z_Load(const char *z, std::streamsize s_z, uLongf s) {
 
-    char d[s];
+    char *d = new char[s];
 
     uncompress(reinterpret_cast<Bytef *>(d), &s,
                reinterpret_cast<const Bytef *>(z), s_z);
 
-    std::istringstream istrstr(std::string(d, s));
+    extbuf buf(d, s);
 
-    return ReadFromStream(istrstr);
+    std::istream in(&buf);
+
+    bool ok = ReadFromStream(in);
+
+    delete[] d;
+
+    return ok;
   }
 
   [[maybe_unused]] bool ReadolcSprite(const std::wstring &filename) {
