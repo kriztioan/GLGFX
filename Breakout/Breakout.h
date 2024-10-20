@@ -176,8 +176,6 @@ private:
 
           Audio.Play(LostSample);
         }
-
-        InitBall();
         bGameMode = false;
         return;
       }
@@ -413,6 +411,7 @@ private:
 
     sPaddle.x = (ScreenWidth() - sPaddle.w) / 2.0;
     sPaddle.y = (ScreenHeight() - 25);
+    sPaddle.w = 30.0f;
   }
 
   void InitBricks() {
@@ -444,7 +443,7 @@ private:
   struct {
     float x;
     float y;
-    float w = 30.0f;
+    float w;
     float h = 3.0f;
   } sPaddle;
 
