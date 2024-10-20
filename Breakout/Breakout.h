@@ -167,7 +167,7 @@ private:
 
     // Bottom die
     if (sBall.dy > 0.0f) {
-      if ((fBallNewYPos + sBall.r) > ScreenHeight()) {
+      if ((fBallNewYPos + sBall.r) > ScreenHeight() && bGameMode) {
         --nBalls;
         if (nBalls == 0) {
 
@@ -176,6 +176,7 @@ private:
 
           Audio.Play(LostSample);
         }
+        sBall.y = ScreenHeight() + 2 * sBall.r;
         bGameMode = false;
         return;
       }
@@ -315,6 +316,8 @@ private:
 
       if (nBalls == 0) {
         Reset();
+      } else {
+        InitBall();
       }
       bGameMode = true;
     }
