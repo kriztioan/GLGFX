@@ -17,7 +17,7 @@
 
 class extbuf : public std::streambuf {
 public:
-  extbuf(const char *d, size_t s) : beg(d), crt(d), end(d + s) {}
+  extbuf(const char *d, size_t s) : crt(d), end(d + s) {}
 
   int_type underflow() {
     return crt == end ? traits_type::eof() : traits_type::to_int_type(*crt);
@@ -25,14 +25,10 @@ public:
   int_type uflow() {
     return crt == end ? traits_type::eof() : traits_type::to_int_type(*crt++);
   }
-  int_type pbackfail(int_type ch) {
-    bool cond = crt == beg || (ch != traits_type::eof() && ch != crt[-1]);
-    return cond ? traits_type::eof() : traits_type::to_int_type(*--crt);
-  }
   std::streamsize showmanyc() { return end - crt; }
 
 private:
-  const char *beg, *crt, *end;
+  const char *crt, *end;
 };
 
 extern "C" {
