@@ -13,7 +13,6 @@
 #include "../GFX3D.h"
 #include "../GLGFX.h"
 
-#include <codecvt>
 #include <iostream>
 #include <list>
 #include <locale>
@@ -24,8 +23,7 @@ public:
   GFXEngine(int argc, char *argv[]) {
 
     if (argc > 1) {
-      std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> conv;
-      model = conv.from_bytes(argv[1]);
+      model = std::wstring(argv[1], argv[1] + strlen(argv[1]));
     } else {
       std::cerr << "please provide a model\n";
       exit(1);
