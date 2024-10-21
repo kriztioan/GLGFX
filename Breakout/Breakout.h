@@ -94,36 +94,6 @@ private:
     float fBallNewXPos = sBall.x + fDeltaXPos;
     float fBallNewYPos = sBall.y + fDeltaYPos;
 
-    // Left wall
-    if (sBall.dx < 0.0f) {
-      if (fBallNewXPos < sBall.r) {
-        Audio.Play(PaddleSample);
-        sBall.x = sBall.r;
-        sBall.y = m * sBall.r + b;
-        sBall.dx = -sBall.dx;
-        return;
-      }
-    }
-    // Right wall
-    else if ((fBallNewXPos + sBall.r) > ScreenWidth()) {
-      Audio.Play(PaddleSample);
-      sBall.x = ScreenWidth() - sBall.r;
-      sBall.y = m * fBallNewXPos + b;
-      sBall.dx = -sBall.dx;
-      return;
-    }
-
-    // Top wall
-    if (sBall.dy < 0.0f) {
-      if (fBallNewYPos < sBall.r) {
-        Audio.Play(PaddleSample);
-        sBall.y = sBall.r;
-        sBall.x = (fBallNewYPos - b) / m;
-        sBall.dy = -sBall.dy;
-        return;
-      }
-    }
-
     // Paddle top
     if (sBall.dy > 0.0f && (sPaddle.y - sBall.r) >= sBall.y &&
         (sPaddle.y - sBall.r) <= fBallNewYPos) {
@@ -165,6 +135,35 @@ private:
       }
     }
 
+    // Left wall
+    if (sBall.dx < 0.0f) {
+      if (fBallNewXPos < sBall.r) {
+        Audio.Play(PaddleSample);
+        sBall.x = sBall.r;
+        sBall.y = m * sBall.r + b;
+        sBall.dx = -sBall.dx;
+        return;
+      }
+    }
+    // Right wall
+    else if ((fBallNewXPos + sBall.r) > ScreenWidth()) {
+      Audio.Play(PaddleSample);
+      sBall.x = ScreenWidth() - sBall.r;
+      sBall.y = m * fBallNewXPos + b;
+      sBall.dx = -sBall.dx;
+      return;
+    }
+
+    // Top wall
+    if (sBall.dy < 0.0f) {
+      if (fBallNewYPos < sBall.r) {
+        Audio.Play(PaddleSample);
+        sBall.y = sBall.r;
+        sBall.x = (fBallNewYPos - b) / m;
+        sBall.dy = -sBall.dy;
+        return;
+      }
+    }
     // Bottom die
     if (sBall.dy > 0.0f) {
       if ((fBallNewYPos + sBall.r) > ScreenHeight() && bGameMode) {
