@@ -8,15 +8,15 @@
  ***********************************************/
 
 #include <fstream>
-#include <string>
 #include <iomanip>
-#include <zlib.h>
 #include <iostream>
+#include <string>
+#include <zlib.h>
 
 int main(int argc, char *argv[]) {
 
-  if(argc != 2) {
-    std::cerr << "need one input files\n";
+  if (argc != 2) {
+    std::cerr << "need one input file\n";
     return 1;
   }
 
@@ -26,7 +26,8 @@ int main(int argc, char *argv[]) {
 
   ifstr.open(path, std::ios::in | std::ios::binary);
 
-  if(ifstr.fail()) return 2;
+  if (ifstr.fail())
+    return 2;
 
   std::streampos beg = ifstr.tellg();
 
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
 
   unsigned char *buff = new unsigned char[size];
 
-  ifstr.read(reinterpret_cast<char*>(buff), size);
+  ifstr.read(reinterpret_cast<char *>(buff), size);
 
   ifstr.close();
 
@@ -48,7 +49,13 @@ int main(int argc, char *argv[]) {
 
   Bytef *z_buff = new Bytef[z_size];
 
-  compress2(z_buff, &z_size, static_cast<Bytef *>(buff), size, Z_BEST_COMPRESSION);
+  if (Z_OK != compress2(z_buff, &z_size, static_cast<Bytef *>(buff), size,
+                        Z_BEST_COMPRESSION)) {
+
+    delete[] buff;
+
+    return 3;
+  }
 
   delete[] buff;
 
@@ -56,36 +63,43 @@ int main(int argc, char *argv[]) {
 
   std::size_t pos = path.find_last_of('/');
 
-  if(pos != std::string::npos) {
+  if (pos != std::string::npos) {
     dir = path.substr(0, pos);
-    if(pos < path.length()) file = path.substr(pos+1);
-  } else file = path;
+    if (pos < path.length())
+      file = path.substr(pos + 1);
+  } else
+    file = path;
 
   pos = file.find_last_of('.');
 
   std::string base = (pos == std::string::npos) ? file : file.substr(0, pos);
 
-  if(base.empty()) {
+  if (base.empty()) {
     delete[] z_buff;
-    return 3;
+    return 4;
   }
 
   std::ofstream ofstr;
 
   ofstr.open(base + ".c", std::ios::out);
 
-  if(ofstr.fail()) {
+  if (ofstr.fail()) {
     delete[] z_buff;
-    return 4;
+    return 5;
   }
 
-  ofstr << "#include<stdlib.h>\nsize_t " << base << "_s = " << size << ";\nsize_t " << base << "_sz = " << z_size << ";\nconst char " << base << "_z[] = {";
+  ofstr << "#include<stdlib.h>\nsize_t " << base << "_s = " << size
+        << ";\nsize_t " << base << "_sz = " << z_size << ";\nconst char "
+        << base << "_z[] = {";
 
-  for( int i = 0; i < (z_size-1); i++) {
-    if (0 == (i % 16)) ofstr << "\n";
-    ofstr << std::showbase << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(z_buff[i]) << ",";
+  for (int i = 0; i < (z_size - 1); i++) {
+    if (0 == (i % 16))
+      ofstr << "\n";
+    ofstr << std::showbase << std::setw(2) << std::setfill('0') << std::hex
+          << static_cast<int>(z_buff[i]) << ",";
   }
-  ofstr << std::showbase << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(z_buff[z_size-1]) << "};" << std::endl;
+  ofstr << std::showbase << std::setw(2) << std::setfill('0') << std::hex
+        << static_cast<int>(z_buff[z_size - 1]) << "};" << std::endl;
 
   delete[] z_buff;
 
