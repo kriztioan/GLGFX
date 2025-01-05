@@ -124,7 +124,7 @@ public:
 
     glutInit(argc, argv);
 
-    glutInitDisplayString("rgb double samples=8 hidpi");
+    glutInitDisplayString("rgb double hidpi");
 
     glutInitWindowSize(RGBScreenBuffer.width * static_cast<int>(nPointSize),
                        RGBScreenBuffer.height * static_cast<int>(nPointSize));
@@ -140,8 +140,6 @@ public:
     glutCreateWindow(sTitle.c_str());
 
     glutWMCloseFunc(WMExit);
-
-    // glutCloseFunc( WMExit );
   }
 
   void Start() {
@@ -175,25 +173,23 @@ public:
 
     std::atexit(Exit);
 
+    glClearColor(1, 1, 1, 1);
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
 
     glLoadIdentity();
 
-    float fHalf = ((float)me->nPointSize) / 2.0f;
-
     gluOrtho2D(
-        -fHalf,
-        ((static_cast<float>(me->RGBScreenBuffer.width) * me->nPointSize)) -
-            fHalf,
-        (static_cast<float>(me->RGBScreenBuffer.height) * me->nPointSize) -
-            fHalf,
-        -fHalf);
+        0, static_cast<float>(me->RGBScreenBuffer.width) * me->nPointSize,
+        static_cast<float>(me->RGBScreenBuffer.height) * me->nPointSize, 0);
 
     glRasterPos2i(0, 0);
 
     glDisable(GL_POINT_SMOOTH);
+
+    glDisable(GL_DEPTH_TEST);
 
     glPixelZoom(nPointSize, -nPointSize);
 

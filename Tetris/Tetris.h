@@ -220,6 +220,7 @@ class Tetris : public cb::GLGFX {
         if( KeyUp( 'r' ) ) Reset();
         if( KeyUp( 'q' ) ) bFinished = true;
         if( KeyUp( 'p' ) ) bPaused = !bPaused;
+        if( KeyUp( 'f' ) ) bShowFPS = !bShowFPS;
     }
 
     void Draw() {
@@ -269,7 +270,6 @@ class Tetris : public cb::GLGFX {
         if( bGameOver ) DrawString( nOffsetX + nPixelSize, nOffsetY + ( nFieldHeight / 2 - 1 ) * nPixelSize, "GAME OVER!", FG_GREY1 );
 
         if( bPaused ) DrawString( nOffsetX + 3 * nPixelSize, nOffsetY + ( nFieldHeight / 2 - 1 ) * nPixelSize, "PAUSED", FG_MAROON );
-
     }
 
     void Logic() {
