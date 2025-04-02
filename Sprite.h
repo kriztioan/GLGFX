@@ -68,7 +68,7 @@ public:
     return true;
   }
 
-  [[maybe_unused]] bool Read(const std::wstring &filename) {
+  [[maybe_unused]] bool Read(const std::filesystem::path &filename) {
 
     std::ifstream ifstr(filename, std::ios::in | std::ios::binary);
 
@@ -150,7 +150,7 @@ public:
     return true;
   }
 
-  [[maybe_unused]] bool Write(const std::wstring &filename) {
+  [[maybe_unused]] bool Write(const std::filesystem::path &filename) {
 
     if (nSpriteWidth * nSpriteHeight <= 0)
       return false;

@@ -80,7 +80,7 @@ private:
     Audio.SetVolume(25);
     Audio.Start();
 
-    std::ifstream ifstr(L".destroyer");
+    std::ifstream ifstr(std::filesystem::path(L".destroyer"));
     if (ifstr.good()) {
       ifstr >> nBestHits;
       ifstr.close();
@@ -234,7 +234,7 @@ private:
     if (nDepthCharges == 0 && vDepthCharges.empty()) {
       if (nHits > nBestHits) {
         nBestHits = nHits;
-        std::ofstream ofstr(L".destroyer");
+        std::ofstream ofstr(std::filesystem::path(L".destroyer"));
         if (ofstr.good()) {
           ofstr << nBestHits;
           ofstr.close();

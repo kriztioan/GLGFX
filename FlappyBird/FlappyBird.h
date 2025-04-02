@@ -67,7 +67,7 @@ private:
     Audio.SetVolume(25);
     Audio.Start();
 
-    std::ifstream ifstr(L".flappybird");
+    std::ifstream ifstr(std::filesystem::path(L".flappybird"));
     if (ifstr.good()) {
       ifstr >> nBestScore;
       ifstr.close();
@@ -174,7 +174,7 @@ private:
 
     if (bGameOver && nScore > nBestScore) {
       nBestScore = nScore;
-      std::ofstream ofstr(L".flappybird");
+      std::ofstream ofstr(std::filesystem::path(L".flappybird"));
       if (ofstr.good()) {
         ofstr << nBestScore;
         ofstr.close();

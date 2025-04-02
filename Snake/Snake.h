@@ -71,7 +71,7 @@ private:
 
       if (bGameOver && score > highscore) {
         highscore = score;
-        std::ofstream ofstr(L".snake");
+        std::ofstream ofstr(std::filesystem::path(L".snake"));
         if (ofstr.good()) {
           ofstr << highscore;
           ofstr.close();
@@ -139,8 +139,9 @@ private:
     aField[charm] = 64;
     cCol = charm % cCols;
     cRow = charm / cCols;
-    DrawFilledCircle(cCol * nCellSize + nCellSize / 2, cRow * nCellSize + nCellSize / 2, nCellSize / 2 - 1,
-                        FG_CYAN);
+    DrawFilledCircle(cCol * nCellSize + nCellSize / 2,
+                     cRow * nCellSize + nCellSize / 2, nCellSize / 2 - 1,
+                     FG_CYAN);
   }
 
   void Input() {
@@ -198,7 +199,7 @@ private:
     }
 
     score = 0;
-    std::ifstream ifstr(L".snake");
+    std::ifstream ifstr(std::filesystem::path(L".snake"));
     if (ifstr.good()) {
       ifstr >> highscore;
       ifstr.close();

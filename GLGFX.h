@@ -585,7 +585,8 @@ public:
     }
   }
 
-  [[maybe_unused]] static Bitmap *ReadBitmap(const std::wstring &filename) {
+  [[maybe_unused]] static Bitmap *
+  ReadBitmap(const std::filesystem::path &filename) {
 
     std::ifstream ifstr(filename, std::ios::in | std::ios::binary);
 
@@ -684,8 +685,7 @@ private:
 
   cb::Sprite sFont;
 
-  struct timespec sStartTimespec {
-  }, sStopTimespec{};
+  struct timespec sStartTimespec{}, sStopTimespec{};
 
   float fElapsedTime = 0.0f;
 
