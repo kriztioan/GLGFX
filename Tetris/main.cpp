@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   Tetris gfx;
 
-  gfx.ConstructWindow(164, 240, 8, &argc, argv);
+  gfx.ConstructWindow(164, 240, 4, &argc, argv);
   gfx.Start();
 
   return 0;

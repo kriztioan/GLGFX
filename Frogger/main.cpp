@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   Frogger gfx;
 
-  gfx.ConstructWindow(128, 80, 8, &argc, argv);
+  gfx.ConstructWindow(128, 80, 4, &argc, argv);
   gfx.Start();
 
   return 0;

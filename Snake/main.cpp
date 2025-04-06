@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   Snake gfx;
 
-  gfx.ConstructWindow(160, 240, 4, &argc, argv);
+  gfx.ConstructWindow(160, 240, 2, &argc, argv);
   gfx.Start();
 
   return 0;

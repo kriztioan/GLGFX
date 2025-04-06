@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(Frogger)
+project(Frogger C CXX OBJCXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -13,7 +13,7 @@ find_library(AUDIOUNIT AudioUnit)
 
 find_package(ZLIB)
 
-add_executable(Frogger main.cpp Frogger.h ../GLGFX.h ../nesfont8x8.c ../Sprite.h ../Audio.h ../SampledAudio.h sfx/hop.c sfx/music.c sfx/plunk.c sfx/squash.c sfx/timeout.c sfx/winner.c)
+add_executable(Frogger main.cpp Frogger.h ../retina_helper.mm ../GLGFX.h ../nesfont8x8.c ../Sprite.h ../Audio.h ../SampledAudio.h sfx/hop.c sfx/music.c sfx/plunk.c sfx/squash.c sfx/timeout.c sfx/winner.c)
 
 target_link_libraries(Frogger ${OPENGL} ${ZLIB_LIBRARIES} ${COREAUDIO} ${AUDIOUNIT} ${GLUT_LIBRARIES})
 

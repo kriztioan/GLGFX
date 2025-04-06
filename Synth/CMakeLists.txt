@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(Synth)
+project(Synth LANGUAGES C CXX OBJCXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -19,7 +19,7 @@ find_library(AUDIOUNIT AudioUnit)
 
 find_package(ZLIB)
 
-add_executable(Synth main.cpp ../GLGFX.h ../nesfont8x8.c ../Sprite.h ../Audio.h Synth.h)
+add_executable(Synth main.cpp ../retina_helper.mm ../GLGFX.h ../nesfont8x8.c ../Sprite.h ../Audio.h Synth.h)
 
 target_link_libraries(Synth ${OPENGL} ${ZLIB_LIBRARIES} ${COREAUDIO} ${AUDIOUNIT} ${GLUT_LIBRARIES} PkgConfig::FFTW3 PkgConfig::FFTW3F)
 

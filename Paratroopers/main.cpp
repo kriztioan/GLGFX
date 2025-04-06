@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   Paratroopers gfx;
 
-  gfx.ConstructWindow(319, 239, 6, &argc, argv);
+  gfx.ConstructWindow(319, 239, 3, &argc, argv);
 
   gfx.Start();
 

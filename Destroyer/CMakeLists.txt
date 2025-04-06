@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(Destroyer)
+project(Destroyer LANGUAGES C CXX OBJCXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -13,7 +13,7 @@ find_library(AUDIOUNIT AudioUnit)
 
 find_package(ZLIB)
 
-add_executable(Destroyer main.cpp Destroyer.h ../GLGFX.h ../nesfont8x8.c ../Sprite.h ../Audio.h ../SampledAudio.h)
+add_executable(Destroyer main.cpp Destroyer.h ../retina_helper.mm ../GLGFX.h ../nesfont8x8.c ../Sprite.h ../Audio.h ../SampledAudio.h)
 
 target_link_libraries(Destroyer ${OPENGL} ${ZLIB_LIBRARIES} ${COREAUDIO} ${AUDIOUNIT} ${GLUT_LIBRARIES})
 

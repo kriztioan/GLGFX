@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   Breakout gfx;
 
-  gfx.ConstructWindow(200, 320, 4, &argc, argv);
+  gfx.ConstructWindow(200, 320, 2, &argc, argv);
   gfx.Start();
 
   return 0;

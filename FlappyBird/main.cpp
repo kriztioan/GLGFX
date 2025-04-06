@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   FlappyBird gfx;
 
-  gfx.ConstructWindow(320, 200, 6, &argc, argv);
+  gfx.ConstructWindow(320, 200, 3, &argc, argv);
   gfx.Start();
 
   return 0;

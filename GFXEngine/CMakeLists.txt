@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(GFXEngine)
+project(GFXEngine LANGUAGES C CXX OBJCXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -13,7 +13,7 @@ find_library(AUDIOUNIT AudioUnit)
 
 find_package(ZLIB)
 
-add_executable(GFXEngine main.cpp GFXEngine.h ../GLGFX.h ../nesfont8x8.c ../Sprite.h)
+add_executable(GFXEngine main.cpp GFXEngine.h ../retina_helper.mm ../GLGFX.h ../nesfont8x8.c ../Sprite.h)
 
 target_link_libraries(GFXEngine ${OPENGL} ${ZLIB_LIBRARIES} ${COREAUDIO} ${AUDIOUNIT} ${GLUT_LIBRARIES})
 

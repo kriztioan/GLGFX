@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(Paratroopers)
+project(Paratroopers LANGUAGES C CXX OBJCXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -13,7 +13,7 @@ find_library(AUDIOUNIT AudioUnit)
 
 find_package(ZLIB)
 
-add_executable(Paratroopers main.cpp ../GLGFX.h ../nesfont8x8.c ../Sprite.h ../Audio.h ../SampledAudio.h Paratroopers.h)
+add_executable(Paratroopers main.cpp ../retina_helper.mm ../GLGFX.h ../nesfont8x8.c ../Sprite.h ../Audio.h ../SampledAudio.h Paratroopers.h)
 
 add_subdirectory(engine)
 

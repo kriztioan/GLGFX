@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(Breakout)
+project(Breakout LANGUAGES C CXX OBJCXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -13,7 +13,7 @@ find_library(AUDIOUNIT AudioUnit)
 
 find_package(ZLIB)
 
-add_executable(Breakout main.cpp ../GLGFX.h ../nesfont8x8.c ../Audio.h ../SampledAudio.h)
+add_executable(Breakout main.cpp ../retina_helper.mm ../GLGFX.h ../nesfont8x8.c ../Audio.h ../SampledAudio.h)
 
 target_link_libraries(Breakout ${ZLIB_LIBRARIES} ${OPENGL} ${COREAUDIO} ${AUDIOUNIT} ${GLUT_LIBRARIES})
 

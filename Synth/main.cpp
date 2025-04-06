@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   Synth gfx;
 
-  gfx.ConstructWindow(320, 280, 4, &argc, argv);
+  gfx.ConstructWindow(320, 280, 2, &argc, argv);
   gfx.Start();
 
   return 0;

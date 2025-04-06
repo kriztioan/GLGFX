@@ -11,10 +11,10 @@
 
 int main(int argc, char *argv[]) {
 
-    GameOfLife gfx;
+  GameOfLife gfx;
 
-    gfx.ConstructWindow( 320, 240, 8, &argc, argv );
-    gfx.Start();
+  gfx.ConstructWindow(320, 240, 4, &argc, argv);
+  gfx.Start();
 
-    return 0;
+  return 0;
 }

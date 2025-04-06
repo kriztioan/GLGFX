@@ -25,6 +25,8 @@ extern "C" size_t nesfont8x8_s;
 extern "C" size_t nesfont8x8_sz;
 extern "C" const char nesfont8x8_z[];
 
+extern float getDisplayScalingFactor();
+
 namespace cb {
 class GLGFX;
 }
@@ -112,30 +114,30 @@ public:
 
     RGBScreenBuffer.height = height;
 
-    RGBScreenBuffer.rgb =
-        new RGB[RGBScreenBuffer.width * RGBScreenBuffer.height];
+    RGBScreenBuffer.rgb = new RGB[width * height];
 
     sFont.z_Load(nesfont8x8_z, nesfont8x8_sz, nesfont8x8_s);
 
-    std::fill_n(RGBScreenBuffer.rgb,
-                RGBScreenBuffer.width * RGBScreenBuffer.height, rgb[FG_RED]);
+    std::fill_n(RGBScreenBuffer.rgb, width * height, rgb[FG_RED]);
 
-    nPointSize = static_cast<float>(pointsize);
+    float fPixelScale = getDisplayScalingFactor();
+
+    fPointSize = static_cast<float>(pointsize) * fPixelScale;
 
     glutInit(argc, argv);
 
     glutInitDisplayString("rgb double hidpi");
 
-    glutInitWindowSize(RGBScreenBuffer.width * static_cast<int>(nPointSize),
-                       RGBScreenBuffer.height * static_cast<int>(nPointSize));
+    glutInitWindowSize(width * static_cast<int>(fPointSize),
+                       height * static_cast<int>(fPointSize));
 
     glutInitWindowPosition(
-        (glutGet(GLUT_SCREEN_WIDTH) -
-         RGBScreenBuffer.width * static_cast<int>(nPointSize)) /
-            2,
-        (glutGet(GLUT_SCREEN_HEIGHT) -
-         RGBScreenBuffer.width * static_cast<int>(nPointSize)) /
-            2);
+        (static_cast<int>(fPixelScale) *
+         (glutGet(GLUT_SCREEN_WIDTH) - (pointsize * width))) >>
+            1,
+        (static_cast<int>(fPixelScale) *
+         (glutGet(GLUT_SCREEN_HEIGHT) - (pointsize * height))) >>
+            1);
 
     glutCreateWindow(sTitle.c_str());
 
@@ -173,17 +175,13 @@ public:
 
     std::atexit(Exit);
 
-    glClearColor(1, 1, 1, 1);
-
-    glClear(GL_COLOR_BUFFER_BIT);
-
     glMatrixMode(GL_PROJECTION);
 
     glLoadIdentity();
 
     gluOrtho2D(
-        0, static_cast<float>(me->RGBScreenBuffer.width) * me->nPointSize,
-        static_cast<float>(me->RGBScreenBuffer.height) * me->nPointSize, 0);
+        0, static_cast<float>(me->RGBScreenBuffer.width) * me->fPointSize,
+        static_cast<float>(me->RGBScreenBuffer.height) * me->fPointSize, 0);
 
     glRasterPos2i(0, 0);
 
@@ -191,7 +189,7 @@ public:
 
     glDisable(GL_DEPTH_TEST);
 
-    glPixelZoom(nPointSize, -nPointSize);
+    glPixelZoom(fPointSize, -fPointSize);
 
     glutMainLoop(); // never returns :-/
   }
@@ -284,6 +282,8 @@ public:
   }
 
   [[maybe_unused]] inline void Clear(int color = FG_WHITE) {
+
+    glClearColor(rgb[color].r, rgb[color].g, rgb[color].b, 1.0);
 
     std::fill_n(RGBScreenBuffer.rgb,
                 RGBScreenBuffer.width * RGBScreenBuffer.height, rgb[color]);
@@ -689,7 +689,7 @@ private:
 
   float fElapsedTime = 0.0f;
 
-  float nPointSize{};
+  float fPointSize{};
 
   Bitmap RGBScreenBuffer{};
 
@@ -748,6 +748,8 @@ private:
                  {238.0f, 238.0f, 238.0f}};
 
   static void Display() {
+
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glDrawPixels(me->RGBScreenBuffer.width, me->RGBScreenBuffer.height, GL_RGB,
                  GL_FLOAT, me->RGBScreenBuffer.rgb);
@@ -851,9 +853,9 @@ private:
     if (!me->OnUserResize())
       exit(0);
 
-    // me->RGBScreenBuffer.width = 2 * width / me->nPointSize;
+    // me->RGBScreenBuffer.width = 2 * width / me->fPointSize;
 
-    // me->RGBScreenBuffer.height = 2 * height / me->nPointSize;
+    // me->RGBScreenBuffer.height = 2 * height / me->fPointSize;
   }
 
   static void WMExit() { exit(0); }

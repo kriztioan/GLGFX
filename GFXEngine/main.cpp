@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   GFXEngine gfx(argc, argv);
 
-  gfx.ConstructWindow(1920, 1080, 1, &argc, argv);
+  gfx.ConstructWindow(960, 540, 1, &argc, argv);
 
   gfx.Start();
 }
