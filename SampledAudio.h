@@ -12,8 +12,8 @@
 
 #include "Audio.h"
 
-#include <vector>
 #include <fstream>
+#include <vector>
 
 extern "C" {
 #include <zlib.h>
@@ -26,7 +26,7 @@ class SampledAudio;
 typedef struct _AudioSample {
   _AudioSample() = default;
 
-  _AudioSample( char *d, size_t s ) : data( d ), size( s ) {};
+  _AudioSample(char *d, size_t s) : data(d), size(s) {};
   char *data;
   size_t size;
 } AudioSample;
@@ -39,55 +39,55 @@ typedef struct {
 
 class cb::SampledAudio : public cb::Audio {
 public:
-
   SampledAudio() noexcept = default;
 
   [[maybe_unused]] void Start() {
 
     Audio::Start();
 
-    SetCallback( [ & ]( double fFrameTime, void *mData, size_t mDataByteSize ) {
+    SetCallback([&](double fFrameTime, void *mData, size_t mDataByteSize) {
       size_t bytes_to_copy;
-      char *buf = ( char * ) mData, *p, *pp;
-      bzero( buf, mDataByteSize );
+      char *buf = (char *)mData, *p, *pp;
+      bzero(buf, mDataByteSize);
 
-      if( !mixer || samples.empty() ) return;
+      if (!mixer || samples.empty())
+        return;
 
-      for( unsigned int i = 0; i < channels; i++ ) {
-        if( mixer[ i ].pos == 0 ) continue;
-        if( mixer[ i ].pos == samples.at( mixer[ i ].sample ).size ) {
+      for (unsigned int i = 0; i < channels; i++) {
+        if (mixer[i].pos == 0)
+          continue;
+        if (mixer[i].pos == samples.at(mixer[i].sample).size) {
 
-          if( mixer[ i ].loop ) {
-            mixer[ i ].pos = 1;
+          if (mixer[i].loop) {
+            mixer[i].pos = 1;
           } else {
-            mixer[ i ].pos = 0;
+            mixer[i].pos = 0;
             continue;
           }
         }
 
-        p = samples.at( mixer[ i ].sample ).data
-            + mixer[ i ].pos - 1;
+        p = samples.at(mixer[i].sample).data + mixer[i].pos - 1;
 
-        if( ( mixer[ i ].pos + mDataByteSize ) <= samples.at( mixer[ i ].sample ).size ) {
+        if ((mixer[i].pos + mDataByteSize) <=
+            samples.at(mixer[i].sample).size) {
           bytes_to_copy = mDataByteSize;
         } else {
-          bytes_to_copy = samples.at( mixer[ i ].sample ).size - mixer[ i ].pos - 1;
+          bytes_to_copy = samples.at(mixer[i].sample).size - mixer[i].pos - 1;
         }
 
-        mixer[ i ].pos += bytes_to_copy + 1;
+        mixer[i].pos += bytes_to_copy + 1;
         pp = buf;
         float b;
-        while( bytes_to_copy-- ) {
+        while (bytes_to_copy--) {
           // avoid clipping
-          b = static_cast< float >( *pp ) +
-              static_cast< float >( *p );
-          *pp++ = static_cast< char >( 127.0f * tanhf( b / 127.0f ) );
+          b = static_cast<float>(*pp) + static_cast<float>(*p);
+          *pp++ = static_cast<char>(127.0f * tanhf(b / 127.0f));
           ++p;
         }
       }
-    } );
+    });
 
-    mixer = new AudioChannel[channels] {};
+    mixer = new AudioChannel[channels]{};
   }
 
   [[maybe_unused]] void Stop() {
@@ -97,92 +97,113 @@ public:
     mixer = nullptr;
   };
 
-  [[maybe_unused]] size_t LoadFromFile( const char *filename ) {
+  [[maybe_unused]] size_t LoadFromFile(const char *filename,
+                                       char attenuation = 1) {
 
     std::ifstream ifstr;
 
-    ifstr.open( filename, std::ios::in | std::ios::binary );
-    if( ifstr.fail() ) return -1;
+    ifstr.open(filename, std::ios::in | std::ios::binary);
+    if (ifstr.fail())
+      return -1;
+
+    char att = std::clamp(attenuation, (char)1, (char)127);
 
     AudioSample s;
 
-    ifstr.seekg( 0, std::ios::end );
+    ifstr.seekg(0, std::ios::end);
     size_t size = s.size = ifstr.tellg();
-    ifstr.seekg( 0, std::ios::beg );
+    ifstr.seekg(0, std::ios::beg);
     s.data = new char[s.size];
-    ifstr.read( s.data, s.size );
+    ifstr.read(s.data, s.size);
     char *tmp = s.data;
-    while( size-- ) *tmp++ -= 127;
-    samples.emplace_back( s );
+    while (size--) {
+      *tmp -= 127;
+      *tmp++ /= att;
+    }
+    samples.emplace_back(s);
 
     ifstr.close();
 
     return samples.size() - 1;
   }
 
-  [[maybe_unused]] size_t Load( const char *sample, size_t size ) {
+  [[maybe_unused]] size_t Load(const char *sample, size_t size,
+                               char attenuation = 1) {
+
+    char att = std::clamp(attenuation, (char)1, (char)127);
 
     AudioSample s;
     s.size = size;
     s.data = new char[s.size];
-    std::memcpy( s.data, sample, s.size );
+    std::memcpy(s.data, sample, s.size);
     char *tmp = s.data;
-    while( size-- ) *tmp++ -= 127;
+    while (size--) {
+      *tmp -= 127;
+      *tmp++ /= att;
+    }
 
-    samples.emplace_back( s );
+    samples.emplace_back(s);
     return samples.size() - 1;
   }
 
-  [[maybe_unused]] int z_Load( const char *z, size_t s_z, uLongf s ) {
+  [[maybe_unused]] int z_Load(const char *z, size_t s_z, uLongf s,
+                              char attenuation = 1) {
 
     char *d = new char[s];
 
-    uncompress( reinterpret_cast< Bytef * >( d ), &s, reinterpret_cast< const Bytef * >( z ), s_z );
+    uncompress(reinterpret_cast<Bytef *>(d), &s,
+               reinterpret_cast<const Bytef *>(z), s_z);
 
-    int id = Load( d, s );
+    int id = Load(d, s, attenuation);
 
     delete[] d;
 
     return id;
   }
 
-  [[maybe_unused]] void Play( unsigned int sample, bool loop = false ) {
+  [[maybe_unused]] void Play(unsigned int sample, bool loop = false) {
 
-    if( mixer != nullptr && sample < samples.size() && samples.at( sample ).data != nullptr ) {
+    if (mixer != nullptr && sample < samples.size() &&
+        samples.at(sample).data != nullptr) {
 
-      for( unsigned int i = 0; i < channels; i++ ) {
+      for (unsigned int i = 0; i < channels; i++) {
 
-        if( mixer[ i ].pos == 0 && !mixer[ i ].loop ) {
+        if (mixer[i].pos == 0 && !mixer[i].loop) {
 
-          mixer[ i ].pos = 1;
-          mixer[ i ].sample = sample;
-          mixer[ i ].loop = loop;
+          mixer[i].pos = 1;
+          mixer[i].sample = sample;
+          mixer[i].loop = loop;
           break;
         }
       }
     }
   }
 
-  [[maybe_unused]] size_t PlaySample( char *data, size_t size, bool loop = false ) {
+  [[maybe_unused]] size_t PlaySample(char *data, size_t size,
+                                     bool loop = false) {
 
-    samples.emplace_back( data, size );
+    samples.emplace_back(data, size);
     size_t id = samples.size() - 1;
-    Play( id, loop );
+    Play(id, loop);
     return id;
   }
 
   [[maybe_unused]] void Reset() {
-    if( mixer != nullptr ) bzero( mixer, channels * sizeof( AudioChannel ) );
-    for( auto &s : samples ) delete s.data;
+    if (mixer != nullptr)
+      bzero(mixer, channels * sizeof(AudioChannel));
+    for (auto &s : samples)
+      delete s.data;
     samples.clear();
   };
 
-  [[maybe_unused]] inline void SetAudioChannels( unsigned int chan ) { channels = chan; }
+  [[maybe_unused]] inline void SetAudioChannels(unsigned int chan) {
+    channels = chan;
+  }
 
 protected:
-  std::vector< AudioSample > samples;
+  std::vector<AudioSample> samples;
   unsigned int channels = 16;
   AudioChannel *mixer = nullptr;
 };
 
-#endif //CBGLGFX_SAMPLEDAUDIO_H_
+#endif // CBGLGFX_SAMPLEDAUDIO_H_
