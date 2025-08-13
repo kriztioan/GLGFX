@@ -46,7 +46,7 @@ public:
 
     SetAudioSamplerate(44100);
     SetAudioStereo(1);
-    SetBitsPerChannel(sizeof(short) * 8);
+    SetBitsPerChannel(16);
 
     sample_max = samplerate / 2;
     sample_min = sample_max / sample_size;
@@ -168,7 +168,7 @@ public:
       sample[i] = static_cast<float>(p) * windows.window[i];
       if ((i % step_size) == 0) {
         x1 = i / step_size;
-        y1 = 90 + (sample[i] / 20);
+        y1 = 90 + (sample[i] / 3);
         DrawLine(x0, y0, x1, y1, FG_RED);
         x0 = x1;
         y0 = y1;
@@ -229,35 +229,36 @@ protected:
   std::function<void(double, void *, size_t)> callback = [&](double dFrameTime,
                                                              void *buf,
                                                              size_t size) {
+
     for (size_t i = 0; i < size / sizeof(short); i++) {
       double t = (dFrameTime + (double)i) / (double)samplerate;
       switch (wave_type) {
       case WAVE_NOISE:
         ((short *)buf)[i] =
-            (short)(1000.0 * (2.0 * ((double)rand() / (double)RAND_MAX) - 1.0));
+            (short)(127.0 * (2.0 * ((double)rand() / (double)RAND_MAX) - 1.0));
         break;
       case WAVE_SQUARE:
         ((short *)buf)[i] =
             frequency > 0.0
-                ? (sin(2.0 * frequency * M_PI * t) > 0.0 ? 1000 : -1000)
+                ? (sin(2.0 * frequency * M_PI * t) > 0.0 ? 127 : -127)
                 : 0;
         break;
       case WAVE_TRIANGLE:
         ((short *)buf)[i] =
-            (short)(1000.0 * asin(sin(2.0 * frequency * M_PI * t)) *
+            (short)(127 * asin(sin(2.0 * frequency * M_PI * t)) *
                     (2.0 / M_PI));
         break;
       case WAVE_SAW:
         ((short *)buf)[i] =
             frequency > 0.0
-                ? (short)(1000.0 * (2.0 / M_PI) *
+                ? (short)(127 * (2.0 / M_PI) *
                           (frequency * M_PI * fmod(t, 1.0 / frequency) -
                            (M_PI / 2.0)))
                 : 0;
         break;
       case WAVE_SINE:
       default:
-        ((short *)buf)[i] = (short)(1000.0 * sin(2.0 * frequency * M_PI * t));
+        ((short *)buf)[i] = (short)(127*sin(2.0 * frequency * M_PI * t));
       }
     }
   };
