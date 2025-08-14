@@ -20,6 +20,7 @@ extern "C" {
 #include <unistd.h>
 }
 #include <algorithm>
+#include <climits>
 
 bool wave_type_callback(cb::WidgetButton *button, void *userdata);
 bool window_type_callback(cb::WidgetButton *button, void *userdata);
@@ -46,7 +47,7 @@ public:
 
     SetAudioSamplerate(44100);
     SetAudioStereo(1);
-    SetBitsPerChannel(8);
+    SetBitsPerChannel(sizeof(short) * 8);
 
     sample_max = samplerate / 2;
     sample_min = sample_max / sample_size;
@@ -160,15 +161,15 @@ public:
 
     Clear(FG_BLACK);
 
-    char p;
+    short p;
 
     size_t x0 = 0, y0 = 90, x1, y1, step_size = sample_size / ScreenWidth();
     for (size_t i = 0; i < sample_size; i++) {
-      callback((double)i, &p, 1);
+      callback((double)i, &p, sizeof(short));
       sample[i] = static_cast<float>(p) * windows.window[i];
       if ((i % step_size) == 0) {
         x1 = i / step_size;
-        y1 = 90 + ((int)sample[i] / 3);
+        y1 = 90 + 50 * (sample[i] / SHRT_MAX);
         DrawLine(x0, y0, x1, y1, FG_RED);
         x0 = x1;
         y0 = y1;
@@ -229,34 +230,36 @@ protected:
   std::function<void(double, void *, size_t)> callback = [&](double dFrameTime,
                                                              void *buf,
                                                              size_t size) {
-    for (size_t i = 0; i < size; i++) {
+    for (size_t i = 0; i < size / sizeof(short); i++) {
       double t = (dFrameTime + (double)i) / (double)samplerate;
       switch (wave_type) {
       case WAVE_NOISE:
-        ((char *)buf)[i] =
-            (char)(127.0 * (2.0 * ((double)rand() / (double)RAND_MAX) - 1.0));
+        ((short *)buf)[i] =
+            (short)(SHRT_MAX *
+                    (2.0 * ((double)rand() / (double)RAND_MAX) - 1.0));
         break;
       case WAVE_SQUARE:
-        ((char *)buf)[i] =
+        ((short *)buf)[i] =
             frequency > 0.0
-                ? (sin(2.0 * frequency * M_PI * t) > 0.0 ? 127 : -127)
+                ? (sin(2.0 * frequency * M_PI * t) > 0.0 ? SHRT_MAX : SHRT_MIN)
                 : 0;
         break;
       case WAVE_TRIANGLE:
-        ((char *)buf)[i] =
-            (char)(127 * asin(sin(2.0 * frequency * M_PI * t)) * (2.0 / M_PI));
+        ((short *)buf)[i] =
+            (short)(SHRT_MAX * asin(sin(2.0 * frequency * M_PI * t)) *
+                    (2.0 / M_PI));
         break;
       case WAVE_SAW:
-        ((char *)buf)[i] =
+        ((short *)buf)[i] =
             frequency > 0.0
-                ? (char)(127 * (2.0 / M_PI) *
-                         (frequency * M_PI * fmod(t, 1.0 / frequency) -
-                          (M_PI / 2.0)))
+                ? (short)(SHRT_MAX * (2.0 / M_PI) *
+                          (frequency * M_PI * fmod(t, 1.0 / frequency) -
+                           (M_PI / 2.0)))
                 : 0;
         break;
       case WAVE_SINE:
       default:
-        ((char *)buf)[i] = (char)(127 * sin(2.0 * frequency * M_PI * t));
+        ((short *)buf)[i] = (short)(SHRT_MAX * sin(2.0 * frequency * M_PI * t));
       }
     }
   };

@@ -62,8 +62,7 @@ public:
 
     streamFormat.mSampleRate = samplerate;
     streamFormat.mFormatID = kAudioFormatLinearPCM;
-    streamFormat.mFormatFlags =
-        kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsBigEndian;
+    streamFormat.mFormatFlags = kAudioFormatFlagIsSignedInteger;
     streamFormat.mFramesPerPacket = 1;
     streamFormat.mChannelsPerFrame = stereo;
     streamFormat.mBitsPerChannel = bitsperchannel;
@@ -174,9 +173,9 @@ OSStatus AudioRenderer_(void *inRefCon,
                         AudioUnitRenderActionFlags *ioActionFlags,
                         const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber,
                         UInt32 inNumberFrames, AudioBufferList *ioData) {
-  return static_cast<cb::Audio *>(inRefCon)->AudioRenderer(inRefCon, ioActionFlags,
-                                                       inTimeStamp, inBusNumber,
-                                                       inNumberFrames, ioData);
+  return static_cast<cb::Audio *>(inRefCon)->AudioRenderer(
+      inRefCon, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames,
+      ioData);
 }
 
 #endif // CBGLGFX_AUDIO_H_
