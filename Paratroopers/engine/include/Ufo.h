@@ -24,9 +24,6 @@ public:
   void fragment(Phase *p);
 
   static const char ufo[170];
-  static const size_t et_s;
-  static const size_t et_sz;
-  static const uint8_t et_z[];
 
   int etID;
 };

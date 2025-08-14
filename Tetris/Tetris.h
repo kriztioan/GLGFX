@@ -142,11 +142,10 @@ class Tetris : public cb::GLGFX {
 
     nGameOverID = audio.z_Load(gameover_z, gameover_sz, gameover_s);
 
-    nKorobeinikiID =
-        audio.z_Load(korobeiniki_z, korobeiniki_sz, korobeiniki_s, 3);
+    nKorobeinikiID = audio.z_Load(korobeiniki_z, korobeiniki_sz, korobeiniki_s);
 
-    audio.SetAudioSamplerate(44100);
-    audio.SetAudioStereo(2);
+    audio.SetAudioSamplerate(22050);
+    audio.SetAudioStereo(1);
     audio.SetAudioChannels(32);
     audio.SetBitsPerChannel(8);
     audio.SetVolume(75);

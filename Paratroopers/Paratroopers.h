@@ -38,8 +38,8 @@ class Paratroopers : public cb::GLGFX {
     ufos = new Ufo;
     arena->AddParticipant(ufos);
 
-    audio.SetAudioSamplerate(44100);
-    audio.SetAudioStereo(2);
+    audio.SetAudioSamplerate(22050);
+    audio.SetAudioStereo(1);
     audio.SetAudioChannels(64);
     audio.SetBitsPerChannel(8);
     audio.SetVolume(50);

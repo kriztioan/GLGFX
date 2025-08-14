@@ -50,7 +50,7 @@ private:
 
     audio.SetAudioSamplerate(22050);
     audio.SetAudioStereo(1);
-    audio.SetAudioChannels(64);
+    audio.SetAudioChannels(4);
     audio.SetBitsPerChannel(8);
     audio.SetVolume(25);
     audio.Start();

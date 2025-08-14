@@ -70,7 +70,7 @@ public:
 
         if ((mixer[i].pos + mDataByteSize) <=
             samples.at(mixer[i].sample).size) {
-          bytes_to_copy = mDataByteSize;
+          bytes_to_copy = mDataByteSize - 1;
         } else {
           bytes_to_copy = samples.at(mixer[i].sample).size - mixer[i].pos - 1;
         }
@@ -97,16 +97,13 @@ public:
     mixer = nullptr;
   };
 
-  [[maybe_unused]] size_t LoadFromFile(const char *filename,
-                                       char attenuation = 1) {
+  [[maybe_unused]] size_t LoadFromFile(const char *filename) {
 
     std::ifstream ifstr;
 
     ifstr.open(filename, std::ios::in | std::ios::binary);
     if (ifstr.fail())
       return -1;
-
-    char att = std::clamp(attenuation, (char)1, (char)127);
 
     AudioSample s;
 
@@ -115,46 +112,31 @@ public:
     ifstr.seekg(0, std::ios::beg);
     s.data = new char[s.size];
     ifstr.read(s.data, s.size);
-    char *tmp = s.data;
-    while (size--) {
-      *tmp -= 127;
-      *tmp++ /= att;
-    }
-    samples.emplace_back(s);
-
     ifstr.close();
+    samples.emplace_back(s);
 
     return samples.size() - 1;
   }
 
-  [[maybe_unused]] size_t Load(const char *sample, size_t size,
-                               char attenuation = 1) {
-
-    char att = std::clamp(attenuation, (char)1, (char)127);
+  [[maybe_unused]] size_t Load(const char *sample, size_t size) {
 
     AudioSample s;
     s.size = size;
     s.data = new char[s.size];
     std::memcpy(s.data, sample, s.size);
-    char *tmp = s.data;
-    while (size--) {
-      *tmp -= 127;
-      *tmp++ /= att;
-    }
-
     samples.emplace_back(s);
+
     return samples.size() - 1;
   }
 
-  [[maybe_unused]] int z_Load(const char *z, size_t s_z, uLongf s,
-                              char attenuation = 1) {
+  [[maybe_unused]] int z_Load(const char *z, size_t s_z, uLongf s) {
 
     char *d = new char[s];
 
     uncompress(reinterpret_cast<Bytef *>(d), &s,
                reinterpret_cast<const Bytef *>(z), s_z);
 
-    int id = Load(d, s, attenuation);
+    int id = Load(d, s);
 
     delete[] d;
 
