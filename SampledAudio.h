@@ -56,7 +56,7 @@ public:
       for (unsigned int i = 0; i < channels; i++) {
         if (mixer[i].pos == 0)
           continue;
-        if (mixer[i].pos == samples.at(mixer[i].sample).size) {
+        if (mixer[i].pos > samples.at(mixer[i].sample).size) {
 
           if (mixer[i].loop) {
             mixer[i].pos = 1;
@@ -70,18 +70,18 @@ public:
 
         if ((mixer[i].pos + mDataByteSize) <=
             samples.at(mixer[i].sample).size) {
-          bytes_to_copy = mDataByteSize - 1;
+          bytes_to_copy = mDataByteSize;
         } else {
-          bytes_to_copy = samples.at(mixer[i].sample).size - mixer[i].pos - 1;
+          bytes_to_copy = samples.at(mixer[i].sample).size - mixer[i].pos + 1;
         }
 
-        mixer[i].pos += bytes_to_copy + 1;
+        mixer[i].pos += bytes_to_copy;
         pp = buf;
         float b;
         while (bytes_to_copy--) {
           // avoid clipping
           b = static_cast<float>(*pp) + static_cast<float>(*p);
-          *pp++ = static_cast<char>(127.0f * tanhf(b / 127.0f));
+          *pp++ = std::max(-127.0f, std::min(127.0f, b));
           ++p;
         }
       }
