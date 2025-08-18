@@ -79,10 +79,8 @@ public:
         pp = buf;
         float b;
         while (bytes_to_copy--) {
-          // avoid clipping
-          b = static_cast<float>(*pp) + static_cast<float>(*p);
+          b = static_cast<float>(*pp) + static_cast<float>(*p++);
           *pp++ = std::max(-127.0f, std::min(127.0f, b));
-          ++p;
         }
       }
     });
